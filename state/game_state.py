@@ -35,11 +35,81 @@ def create_initial_state(board_size: int):
     board_diameter = 2 * board_size - 1
     column_letters = [chr(ord('A') + i) for i in range(board_diameter)]
     column_letters = ['LEFT'] + column_letters + ['RIGHT']
+
+    limits = dict()
+
+    for column_letter in column_letters:
+        if column_letter == "LEFT":
+            limits['LEFT'] = (1, board_size - 1)
+        elif column_letter == "RIGHT":
+            limits['RIGHT'] = (board_size + 1, 2*(board_size) - 1)
+        elif ord(column_letter) - ord('A') == (board_size-1): # Ovo je za sredisnje slovo
+            limits[column_letter] = (1, 2* board_size - 1)
+        elif ord(column_letter) - ord('A') < (board_size - 1): # Za slova levo od srednjeg
+            limits[column_letter] = (0, board_size + 1 + ord(column_letter) - ord('A'))
+        elif ord(column_letter) - ord('A') > (board_size - 1): # Za slova desno od srednjeg
+            limits[column_letter] = (ord(column_letter) - (ord('A') + board_size - 1), 2*board_size)
+
+    print(F"LIMIT ZA G JE: {limits['G']}\n")
+
     game_state = {
-        (let, num): (None, []) for let in column_letters for num in range(board_diameter)
+        (let, num) : [None, []] for let in column_letters for num in range(limits[let][0], limits[let][1] + 1)
     }
+    
+    for cell in game_state.keys():
+        cell_letter = cell[0]
+        cell_letter_index = column_letters.index(cell_letter)
+        cell_index = cell[1]
+        letter_to_the_left = column_letters[cell_letter_index - 1] if (cell_letter_index - 1) in range(len(column_letters)) else None
+        letter_to_the_right = column_letters[cell_letter_index + 1] if (cell_letter_index + 1) in range(len(column_letters)) else None
+        neighbors = [
+            (cell_letter, cell_index + 1), # polje iznad
+            (cell_letter, cell_index - 1), # polje ispod
+            (letter_to_the_left, cell_index - 1), # polje gore levo
+            (letter_to_the_left, cell_index), # polje dole levo
+            (letter_to_the_right, cell_index), # polje gore desno
+            (letter_to_the_right, cell_index + 1), # polje dole desno
+        ]
+
+        neighbors = [n for n in neighbors if n in game_state.keys()]
+        game_state[cell][1] = neighbors
+
+    # Inicijalizacija ostrva
+    game_state = initialize_islands(game_state=game_state, board_size=board_size, limits=limits)
+    
     return game_state
     
+# Funckija za inicijalizaciju ostrva
+
+def initialize_islands(game_state: dict, board_size: int, limits: dict):
+    island_size = (board_size-1)//2
+    red_cells = []
+    green_cells = []
+
+    # Leva kolona
+    green_cells += [('LEFT', num) for num in range(1, island_size + 1)]
+    green_cells += [('RIGHT', num) for num in range(board_size + 1 + island_size, 2*board_size)]
+    #Desna kolona
+    red_cells += [('LEFT', num) for num in range(1 + island_size, board_size)]
+    red_cells += [('RIGHT', num) for num in range(board_size + 1, board_size + 1 + island_size)]
+    #Slova
+    letters = [chr(ord('A') + i) for i in range(2*board_size - 1)]
+    middle_letter = ord('A') + (board_size-1)
+    for letter in letters:
+        if ord(letter) < middle_letter: # Za slova koja su levo od srednjeg slova
+            red_cells += [(letter, limits[letter][0]) if (middle_letter - ord(letter) > island_size) else (letter, limits[letter][1])]
+            green_cells += [(letter, limits[letter][1]) if (middle_letter - ord(letter) > island_size) else (letter, limits[letter][0])]
+        elif ord(letter) > middle_letter: # Za slova desno od srednjeg
+            red_cells += [(letter, limits[letter][0]) if (ord(letter) - middle_letter < island_size) else (letter, limits[letter][1])]
+            green_cells += [(letter, limits[letter][0]) if (ord(letter) - middle_letter > island_size) else (letter, limits[letter][1])]
+
+    for cell in green_cells:
+        game_state[cell][0] = "GREEN"
+    for cell in red_cells:
+        game_state[cell][0] = "RED"
+
+    return game_state
+
 # Funkcija za prikaz proizvoljnog stanja TODO    
 
 def display_arbitrary_state():
