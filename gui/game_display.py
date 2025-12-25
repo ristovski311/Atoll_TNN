@@ -1,3 +1,3 @@
 #
-# Prikaz stanja igra TODO
+# Prikaz stanja igre TODO
 #

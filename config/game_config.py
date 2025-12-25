@@ -20,21 +20,17 @@ game_config = {
 
 
 # Funkcija za odredjivanje covek vs covek ili covek vs racunar TODO
-
 def set_computer_as_player():
     print("Postavlja da racunar igra")
     
 # Funkcija za postavljanje da li racunar igra prvi ili covek igra prvi ako je tip igre: covek vs racunar TODO
-
 def set_computer_turn():
     print("Postavlja da li racunar igra prvi ili drugi")
-    
-# Funkcija za odredjivanje da li X ili O igra prvi (X - black tj green / O - white tj red, konfuzno i know...) TODO
 
+# Funkcija za odredjivanje da li X ili O igra prvi (X - black tj green / O - white tj red, konfuzno i know...) TODO
 def set_green_turn():
     print("Postavlja da li green tj X igra prvi ili drugi")
     
 # Funkcija za postavljanje velicine table (dozvoljeno je samo 5/7/9) TODO
-
 def set_table_size():
     print("Postavlja velicinu table za igru")
