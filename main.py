@@ -9,3 +9,5 @@ state = create_initial_state(board_size=game_config["board_size"])
 
 arb = create_arbitrary_state([('A', 3), ('B', 5)], [('E', 3), ('I', 5)])
 #display_graph(arb)
+
+draw(state)
