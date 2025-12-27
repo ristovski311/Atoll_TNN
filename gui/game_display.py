@@ -119,23 +119,19 @@ def on_mouse_move(event, canvas, state):
 
 
 def handle_click(cell, canvas, state):
-    global clicked_cell, click_job, current_player
+    global clicked_cell, click_job
 
-    logic_marker = 'X' if current_player == "GREEN" else 'O'
+    clicked_cell = cell
 
-    success, next_marker = execute_move(state, cell, logic_marker)
+    curr = state[cell][0]
+    nxt = "RED" if curr is None else "GREEN" if curr == "RED" else None
+    state[cell] = (nxt, state[cell][1])
 
-    if success:
-        clicked_cell = cell
-        update_cell_visual(canvas, cell, state)
+    update_cell_visual(canvas, cell, state)
 
-        current_player = "GREEN" if next_marker == 'X' else "RED"
-        
-        if click_job:
-            canvas.after_cancel(click_job)
-        click_job = canvas.after(100, lambda: reset_click(canvas, state))
-    else:
-        messagebox.showwarning("Nevalidan potez", "Polje je zauzeto!")
+    if click_job:
+        canvas.after_cancel(click_job)
+    click_job = canvas.after(100, lambda: reset_click(canvas, state))
 
 
 def reset_click(canvas, state):
