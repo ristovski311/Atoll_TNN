@@ -34,6 +34,17 @@ def input_a_move(game_state):
         else:
             print("Potez nije dozvoljen. Polje ne postoji ili je zauzeto.")
             
+# Funkcija za izvrsenje poteza
+def execute_move(state, position, current_player_marker):
+    if not is_move_valid(state, position):
+        return False, current_player_marker
+
+    set_a_cell(state, position, current_player_marker)
+
+    next_player = 'O' if current_player_marker == 'X' else 'X'
+
+    return True, next_player
+
 # Funkcija za postavljanje polja
 def set_a_cell(state, position, current_player):
     state[position][0] = "GREEN" if current_player in ['x', "X"] else "RED"

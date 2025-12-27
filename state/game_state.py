@@ -48,9 +48,9 @@ def create_initial_state(board_size: int):
     cells_with_neighbors = calculate_cell_neighbors(cells=cells, column_letters=column_letters)
 
     # Inicijalizacija ostrva
-    cells_with_inslands = initialize_islands(cells_with_neighbors,board_size=board_size, limits=limits)
+    cells_with_islands = initialize_islands(cells_with_neighbors,board_size=board_size, limits=limits)
     
-    return cells_with_inslands
+    return cells_with_islands
 
 
 # Pomocna funkcija za odredjivanje opsega indeksa za svaku od kolona

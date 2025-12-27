@@ -1,7 +1,9 @@
 import tkinter as tk
 import os
+from tkinter import messagebox
 from PIL import Image, ImageTk, ImageEnhance
-from config.game_config import game_config
+from config.game_config import *
+from gameplay.game_moves import *
 
 TITLE = 'Atoll'
 RESOLUTION = '800x600'
@@ -32,6 +34,8 @@ click_job = None
 last_base_unit = None
 
 label_coords = set()
+
+current_player = "GREEN"
 
 def darken_image(image, factor):
     enhancer = ImageEnhance.Brightness(image)
@@ -115,19 +119,23 @@ def on_mouse_move(event, canvas, state):
 
 
 def handle_click(cell, canvas, state):
-    global clicked_cell, click_job
+    global clicked_cell, click_job, current_player
 
-    clicked_cell = cell
+    logic_marker = 'X' if current_player == "GREEN" else 'O'
 
-    curr = state[cell][0]
-    nxt = "RED" if curr is None else "GREEN" if curr == "RED" else None
-    state[cell] = (nxt, state[cell][1])
+    success, next_marker = execute_move(state, cell, logic_marker)
 
-    update_cell_visual(canvas, cell, state)
+    if success:
+        clicked_cell = cell
+        update_cell_visual(canvas, cell, state)
 
-    if click_job:
-        canvas.after_cancel(click_job)
-    click_job = canvas.after(100, lambda: reset_click(canvas, state))
+        current_player = "GREEN" if next_marker == 'X' else "RED"
+        
+        if click_job:
+            canvas.after_cancel(click_job)
+        click_job = canvas.after(100, lambda: reset_click(canvas, state))
+    else:
+        messagebox.showwarning("Nevalidan potez", "Polje je zauzeto!")
 
 
 def reset_click(canvas, state):
@@ -263,6 +271,10 @@ def perform_resize(canvas, state):
 
 
 def draw(state):
+    global current_player
+
+    current_player = "GREEN" if game_config["green_plays_first"] else "RED"
+
     root = tk.Tk()
     root.title(TITLE)
     root.geometry(RESOLUTION)
@@ -278,3 +290,50 @@ def draw(state):
     root.after(100, lambda: perform_resize(canvas, state))
 
     root.mainloop()
+
+
+def show_setup_menu():
+    setup_root = tk.Tk()
+    setup_root.title("Atoll - Podesavanja")
+    setup_root.geometry("500x500")
+    
+    size_var = tk.StringVar(value = "5")
+    mode_var = tk.StringVar(value = "H")
+    symbol_var = tk.StringVar(value = "X")
+    
+    status = {"confirmed": False}
+
+    tk.Label(setup_root, text="Velicina table:", font=("Arial", 10, "bold")).pack(pady=5)
+
+    for s in [5, 7, 9]:
+        tk.Radiobutton(setup_root, text=str(s), variable=size_var, value=str(s)).pack()
+
+    tk.Label(setup_root, text="Režim igre:", font=("Arial", 10, "bold")).pack(pady=5)
+    tk.Radiobutton(setup_root, text="Čovek protiv Čoveka", variable=mode_var, value="H").pack()
+    tk.Radiobutton(setup_root, text="Čovek protiv Računara", variable=mode_var, value="A").pack()
+
+    tk.Label(setup_root, text="Ko igra prvi?", font=("Arial", 10, "bold")).pack(pady=5)
+    tk.Radiobutton(setup_root, text="X (Zeleni)", variable=symbol_var, value="X").pack()
+    tk.Radiobutton(setup_root, text="O (Crveni)", variable=symbol_var, value="O").pack()
+
+    def on_button_click():
+        start_game(size_var.get(), mode_var.get(), symbol_var.get(), setup_root)
+        status["confirmed"] = True
+
+    tk.Button(
+        setup_root, 
+        text="ZAPOČNI IGRU", 
+        command=on_button_click, 
+        bg="green", 
+        fg="white", 
+        font=("Arial", 12, "bold")
+    ).pack(pady=20)
+
+    setup_root.mainloop()
+    return status["confirmed"]
+
+def start_game(size, mode, symbol, window_to_close):
+        choose_board_size(size)
+        choose_a_player(mode)
+        choose_first_symbol(symbol)
+        window_to_close.destroy()
