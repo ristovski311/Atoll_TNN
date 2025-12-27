@@ -19,18 +19,64 @@ game_config = {
 
 
 
-# Funkcija za odredjivanje covek vs covek ili covek vs racunar TODO
-def set_computer_as_player():
-    print("Postavlja da racunar igra")
+# Funkcija za odredjivanje covek vs covek ili covek vs racunar
+def choose_game_mode():
+    global game_config
     
-# Funkcija za postavljanje da li racunar igra prvi ili covek igra prvi ako je tip igre: covek vs racunar TODO
-def set_computer_turn():
-    print("Postavlja da li racunar igra prvi ili drugi")
+    while True:
+        print("Izaberite režim igre:")
+        print("1 - Čovek protiv Čoveka")
+        print("2 - Čovek protiv Računara")
+        choice = input("Vaš izbor (1 ili 2): ").strip()
 
-# Funkcija za odredjivanje da li X ili O igra prvi (X - black tj green / O - white tj red, konfuzno i know...) TODO
-def set_green_turn():
-    print("Postavlja da li green tj X igra prvi ili drugi")
+        if choice == "1":
+            game_config["computer_plays"] = False
+            break
+        elif choice == "2":
+            game_config["computer_plays"] = True
+            break
+        else:
+            print("Neispravan izbor. Pokušajte ponovo.")
     
-# Funkcija za postavljanje velicine table (dozvoljeno je samo 5/7/9) TODO
-def set_table_size():
-    print("Postavlja velicinu table za igru")
+# Funkcija za postavljanje da li racunar igra prvi ili covek igra prvi ako je tip igre: covek vs racunar
+def choose_first_player():
+    global game_config
+    
+    while True:
+        choice = input("Ko igra prvi? (H = Human, A = AI): ").strip().upper()
+        if choice == "H":
+            game_config["computer_plays_first"] = False
+            break
+        elif choice == "A":
+            game_config["computer_plays_first"] = True
+            break
+        else:
+            print("Neispravan izbor. Unesite H ili A.")
+
+# Funkcija za odredjivanje da li X ili O igra prvi (X - black tj green / O - white tj red, konfuzno i know...)
+def choose_first_symbol():
+    """
+    Omogućava izbor koji simbol ide prvi: X ili O
+    """
+    while True:
+        choice = input("Koji simbol igra prvi? (X/O): ").strip().upper()
+        if choice == "X":
+            game_config["green_plays_first"] = True
+            break
+        elif choice == "O":
+            game_config["green_plays_first"] = False
+            break
+        else:
+            print("Neispravan izbor. Unesite X ili O.")
+    
+# Funkcija za postavljanje velicine table (dozvoljeno je samo 5/7/9)
+def choose_board_size():
+    global game_config
+    
+    while True:
+        choice = input("Izaberite velicinu table? (5/7/9): ").strip().upper()
+        if choice in ["5", "7", "9"]:
+            game_config["board_size"] = int(choice)
+            break
+        else:
+            print("Unesite dozvoljenu veličinu! 5, 7 ili 9:")

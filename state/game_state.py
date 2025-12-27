@@ -1,4 +1,5 @@
 from config import game_config 
+from gameplay import game_moves
 
 #
 # Funkcije za stanja
@@ -130,7 +131,9 @@ def initialize_islands(cells: dict, board_size: int, limits: dict):
 def create_arbitrary_state(green_cells:list, red_cells:list):
     arbitrary_state = create_initial_state(game_config.game_config["board_size"])
     for cell in green_cells:
-        arbitrary_state[cell][0] = "GREEN"
+        if(game_moves.is_move_valid(arbitrary_state,cell)):
+            arbitrary_state[cell][0] = "GREEN"
     for cell in red_cells:
-        arbitrary_state[cell][0] = "RED"
+        if(game_moves.is_move_valid(arbitrary_state,cell)):    
+            arbitrary_state[cell][0] = "RED"
     return arbitrary_state
