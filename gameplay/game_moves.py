@@ -4,7 +4,7 @@
 
 
 
-# Funkcija za ispravnost unosa poteza (slobodno dodati dodatne f-je ako su potrebne)
+# Funkcija za ispravnost unosa poteza
 def is_move_valid(game_state,position):
     if position not in game_state:
         return False
@@ -16,7 +16,7 @@ def is_move_valid(game_state,position):
     return True
     
 
-# Funkcija za unos poteza
+# Funkcija za unos poteza - ova f-ja se koristi u CLI, ne koristimo je u GUI
 def input_a_move(game_state):
     while True:
         user_input = input("Unesi potez (npr. C 3): ").strip().upper()
@@ -41,5 +41,5 @@ def set_a_cell(state, position, current_player):
 
 ### !!! 
 # Nije potrebno praviti funkcije za odigravanje poteza.
-# Unos poteza i odigravanje je razlicita stvar i guess?
+# Unos poteza i odigravanje je razlicita stvar
 # To je deo faze 2 !!!

@@ -57,7 +57,6 @@ def load_resources():
     if os.path.exists(tex_path):
         original_board_texture = Image.open(tex_path)
 
-
 def get_canvas_coords(cell, board_size, canvas_w, canvas_h):
     letter, row = cell
 
@@ -78,7 +77,6 @@ def get_canvas_coords(cell, board_size, canvas_w, canvas_h):
 
     return (canvas_w / 2) + x, (canvas_h / 2) + y, base_unit
 
-
 def update_cell_visual(canvas, cell, state):
     if cell is None or cell not in cell_items:
         return
@@ -93,7 +91,6 @@ def update_cell_visual(canvas, cell, state):
         mode = "hover"
 
     canvas.itemconfig(item_id, image=sprites[cell_state][mode])
-
 
 def on_mouse_move(event, canvas, state):
     global hovered_cell
@@ -117,7 +114,6 @@ def on_mouse_move(event, canvas, state):
         update_cell_visual(canvas, old, state)
         update_cell_visual(canvas, hovered_cell, state)
 
-
 def handle_click(cell, canvas, state):
     global clicked_cell, click_job
 
@@ -133,20 +129,17 @@ def handle_click(cell, canvas, state):
         canvas.after_cancel(click_job)
     click_job = canvas.after(100, lambda: reset_click(canvas, state))
 
-
 def reset_click(canvas, state):
     global clicked_cell
     old = clicked_cell
     clicked_cell = None
     update_cell_visual(canvas, old, state)
 
-
 def on_resize(event, canvas, state):
     global resize_job
     if resize_job:
         canvas.after_cancel(resize_job)
     resize_job = canvas.after(80, lambda: perform_resize(canvas, state))
-
 
 def draw_labels_around_board(canvas, board_size, width, height, base_unit):
     font_size = int(base_unit * 0.45)
@@ -205,7 +198,6 @@ def draw_labels_around_board(canvas, board_size, width, height, base_unit):
         canvas.create_image(x, y, image=sprites["DARK"]["normal"])
         canvas.create_text(x, y, text=number, fill="white", font=font_style)
         
-
 def perform_resize(canvas, state):
     global last_base_unit, board_texture_sprite, label_coords
 
@@ -265,7 +257,6 @@ def perform_resize(canvas, state):
             lambda e, c=cell: handle_click(c, canvas, state)
         )
 
-
 def draw(state):
     global current_player
 
@@ -286,7 +277,6 @@ def draw(state):
     root.after(100, lambda: perform_resize(canvas, state))
 
     root.mainloop()
-
 
 def show_setup_menu():
     setup_root = tk.Tk()
