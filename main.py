@@ -9,9 +9,9 @@ from auxilary.misc import *
 # Pokretanje igre - prikaz setup menija za izbor opcija igre (velicina table i slicno)
 #
 
-# if show_setup_menu():
-#     state = create_initial_state(board_size=game_config["board_size"])
-#     draw(state)
+if show_setup_menu():
+    state = create_initial_state(board_size=game_config["board_size"])
+    draw(state)
 
 
 

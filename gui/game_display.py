@@ -119,9 +119,12 @@ def handle_click(cell, canvas, state):
 
     clicked_cell = cell
 
-    curr = state[cell][0]
-    nxt = "RED" if curr is None else "GREEN" if curr == "RED" else None
-    state[cell] = (nxt, state[cell][1])
+    nxt = "X" if game_config["green_plays_first"] else "O" # Za sada nismo uveli odigravanje poteza (faza 2), pa uvek unosi isti igrac
+    
+    if is_move_valid(state, cell):
+        set_a_cell(state, cell, nxt)
+    else:
+        messagebox.showwarning("Greska!", "Polje nije validno! Izaberite drugo!")
 
     update_cell_visual(canvas, cell, state)
 
