@@ -14,8 +14,6 @@ if show_setup_menu():
     draw(state)
 
 
-
-
 #
 # CLI
 # Postavljanje konfiguracije igre, a kasnije i prikaz stanja (koriscenjem pomocne f-je display_graph), unos polja, i prikaz nekog proizvoljnog stanja

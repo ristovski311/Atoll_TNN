@@ -4,6 +4,7 @@ from tkinter import messagebox
 from PIL import Image, ImageTk, ImageEnhance
 from config.game_config import *
 from gameplay.game_moves import *
+from state.game_state import check_win_condition
 
 TITLE = 'Atoll'
 RESOLUTION = '800x600'
@@ -123,15 +124,23 @@ def handle_click(cell, canvas, state):
     
     if is_move_valid(state, cell):
         set_a_cell(state, cell, nxt)
+        
     else:
         messagebox.showwarning("Greska!", "Polje nije validno! Izaberite drugo!")
 
     update_cell_visual(canvas, cell, state)
 
+
     if click_job:
         canvas.after_cancel(click_job)
     click_job = canvas.after(100, lambda: reset_click(canvas, state))
 
+    # Provera pobede: #Promeniti nacin prikaza pobede#
+    winner = check_win_condition(state, game_config["board_size"])    
+    if winner:
+        messagebox.showinfo("KRAJ IGRE", f"Čestitamo! Pobednik je: {winner}")
+        return
+    
 def reset_click(canvas, state):
     global clicked_cell
     old = clicked_cell
