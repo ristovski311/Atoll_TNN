@@ -2,7 +2,7 @@
 # Funkcije za poteze
 #
 
-
+import copy
 
 # Funkcija za ispravnost unosa poteza
 def is_move_valid(game_state,position):
@@ -39,7 +39,20 @@ def set_a_cell(state, position, current_player):
     state[position][0] = "GREEN" if current_player in ['x', "X"] else "RED"
     return state
 
-### !!! 
-# Nije potrebno praviti funkcije za odigravanje poteza.
-# Unos poteza i odigravanje je razlicita stvar
-# To je deo faze 2 !!!
+# Vraca novo stanje koje je nastalo odigravanjem poteza
+def get_next_state(current_state, move, player):
+    new_state = copy.deepcopy(current_state)
+
+    if move in new_state:
+        new_state[move][0] = player
+
+    return new_state
+
+# Vraca listu koordinata svih slobodnih polja
+def get_all_possible_moves(current_state):
+    return [coords for coords, info in current_state.items() if info[0] is None]
+
+# Generise listu svih mogucih stanja za sledeci potez
+def get_all_possible_states(current_state, player):
+    moves = get_all_possible_moves(current_state)
+    return [get_next_state(current_state, m, player) for m in moves]

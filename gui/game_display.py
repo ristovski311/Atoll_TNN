@@ -124,6 +124,14 @@ def handle_click(cell, canvas, state):
     
     if is_move_valid(state, cell):
         set_a_cell(state, cell, nxt)
+
+        print(f"POTEZ ODIGRAN: {cell} od strane igraca: {current_player}")
+
+        preostali_potezi = get_all_possible_moves(state)
+        print(f"Preostalo slobodnih polja: {len(preostali_potezi)}")
+
+        if len(preostali_potezi) > 0:
+            print(f"Sledeci igrac bi mogao da odigra na: {preostali_potezi}")
         
     else:
         messagebox.showwarning("Greska!", "Polje nije validno! Izaberite drugo!")
