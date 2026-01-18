@@ -30,7 +30,21 @@ import queue
 #     ('B', 1) : (None, [...])
 # }
 
+current_player = "GREEN"
+
 islands = dict()
+
+def set_current_player(player):
+    global current_player
+    current_player = player
+
+def get_current_player():
+    return current_player
+
+def toggle_current_player():
+    global current_player
+    current_player = "RED" if current_player == "GREEN" else "GREEN"
+    return current_player
 
 # Funkcija za kreiranje inicijalnog stanja
 def create_initial_state(board_size: int):

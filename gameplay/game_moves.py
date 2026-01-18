@@ -36,7 +36,7 @@ def input_a_move(game_state):
 
 # Funkcija za postavljanje polja
 def set_a_cell(state, position, current_player):
-    state[position][0] = "GREEN" if current_player in ['x', "X"] else "RED"
+    state[position][0] = current_player
     return state
 
 # Vraca novo stanje koje je nastalo odigravanjem poteza

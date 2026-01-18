@@ -4,7 +4,7 @@ from tkinter import messagebox
 from PIL import Image, ImageTk, ImageEnhance
 from config.game_config import *
 from gameplay.game_moves import *
-from state.game_state import check_win_condition
+from state.game_state import check_win_condition, get_current_player, toggle_current_player, set_current_player
 
 TITLE = 'Atoll'
 RESOLUTION = '800x600'
@@ -36,7 +36,7 @@ last_base_unit = None
 
 label_coords = set()
 
-current_player = "GREEN"
+can_play = True
 
 def darken_image(image, factor):
     enhancer = ImageEnhance.Brightness(image)
@@ -116,16 +116,21 @@ def on_mouse_move(event, canvas, state):
         update_cell_visual(canvas, hovered_cell, state)
 
 def handle_click(cell, canvas, state):
-    global clicked_cell, click_job
+    global clicked_cell, click_job, can_play
+
+    if can_play is False:
+        return
 
     clicked_cell = cell
-
-    nxt = "X" if game_config["green_plays_first"] else "O" # Za sada nismo uveli odigravanje poteza (faza 2), pa uvek unosi isti igrac
     
     if is_move_valid(state, cell):
-        set_a_cell(state, cell, nxt)
+        current_player = get_current_player()
+        set_a_cell(state, cell, current_player)
 
         print(f"POTEZ ODIGRAN: {cell} od strane igraca: {current_player}")
+
+        next_player = toggle_current_player()
+        print(f"Sledeci igrac: {next_player}")
 
         preostali_potezi = get_all_possible_moves(state)
         print(f"Preostalo slobodnih polja: {len(preostali_potezi)}")
@@ -146,6 +151,7 @@ def handle_click(cell, canvas, state):
     # Provera pobede: #Promeniti nacin prikaza pobede#
     winner = check_win_condition(state, game_config["board_size"])    
     if winner:
+        can_play = False
         messagebox.showinfo("KRAJ IGRE", f"Čestitamo! Pobednik je: {winner}")
         return
     
@@ -280,7 +286,7 @@ def perform_resize(canvas, state):
 def draw(state):
     global current_player
 
-    current_player = "GREEN" if game_config["green_plays_first"] else "RED"
+    set_current_player("GREEN" if game_config["green_plays_first"] else "RED")
 
     root = tk.Tk()
     root.title(TITLE)
