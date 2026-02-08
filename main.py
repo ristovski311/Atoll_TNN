@@ -4,14 +4,17 @@ from gameplay.game_moves import *
 from gui.game_display import *
 from auxilary.misc import *
 
+
+
+
 #
 # GUI
 # Pokretanje igre - prikaz setup menija za izbor opcija igre (velicina table i slicno)
 #
 
 if show_setup_menu():
-    state = create_initial_state(board_size=game_config["board_size"])
-    draw(state)
+   state = create_initial_state(board_size=game_config["board_size"])
+   draw(state)
 
 
 #

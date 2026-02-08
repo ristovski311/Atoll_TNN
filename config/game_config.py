@@ -21,46 +21,43 @@ game_config = {
 def choose_game_mode(game_mode_code):
     global game_config
 
-    match game_mode_code:
-        case "1":
-            game_config["computer_plays"] = False
-            return True
-        case "2":
-            game_config["computer_plays"] = True
-            return True
-        case _: 
-            print("Neispravan izbor. Pokušajte ponovo.")
-            return False
+    if game_mode_code == "1":
+        game_config["computer_plays"] = False
+        return True
+    elif game_mode_code == "2":
+        game_config["computer_plays"] = True
+        return True
+    else:
+        print("Neispravan izbor. Pokušajte ponovo.")
+        return False
         
 # Funkcija koja bira ko igra prvi, covek ili racunar, ukoliko je takav gamemode odabran
 def choose_a_player(player_code):
     global game_config
 
-    match player_code:
-        case "H":
-            game_config["computer_plays_first"] = False
-            return True
-        case "A":
-            game_config["computer_plays_first"] = True
-            return True
-        case _:
-            print("Neispravan izbor. Unesite H ili A.")
-            return False
+    if player_code == "H":
+        game_config["computer_plays_first"] = False
+        return True
+    elif player_code == "A":
+        game_config["computer_plays_first"] = True
+        return True
+    else:
+        print("Neispravan izbor. Unesite H ili A.")
+        return False
 
 # Funkcija koja bira koji simbol igra prvi, X ili O
 def choose_first_symbol(first_symbol):
     global game_config
-    
-    match first_symbol:
-        case "X":
-            game_config["green_plays_first"] = True
-            return True
-        case "O":
-            game_config["green_plays_first"] = False
-            return True
-        case _:
-            print("Neispravan izbor. Unesite X ili O.")
-            return False
+
+    if first_symbol == "X":
+        game_config["green_plays_first"] = True
+        return True
+    elif first_symbol == "O":
+        game_config["green_plays_first"] = False
+        return True
+    else:
+        print("Neispravan izbor. Unesite X ili O.")
+        return False
 
 # Funkcija za odabir velicine stranice table, dozvoljeno samo 5, 7 i 9
 def choose_board_size(board_size):

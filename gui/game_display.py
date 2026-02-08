@@ -349,3 +349,35 @@ def start_game(size, mode, symbol, window_to_close):
         choose_a_player(mode)
         choose_first_symbol(symbol)
         window_to_close.destroy()
+
+def cpu_make_move(canvas, state):
+    global can_play
+
+    can_play = False
+
+    current_player = get_current_player()
+    print(f"CPU razmislja... Trenutni igrac: {current_player}")
+
+    move, _ = minimax(
+        state,
+        depth=3,
+        current_player=current_player,
+        maximizing_player=current_player
+    )
+
+    if move:
+        set_a_cell(state, move, current_player)
+        update_cell_visual(canvas, move, state)
+        canvas.update
+        print(f"CPU odigrao: {move}")
+
+    winner = check_win_condition(state, cfg.game_config["board_size"])
+    if winner:
+        messagebox.showinfo("KRAJ IGRE", f"Pobednik je: {winner}")
+        return 
+
+    toggle_current_player()
+    print(f"Nakon CPU poteza, sledeci igrac: {get_current_player()}")
+
+    can_play = True
+

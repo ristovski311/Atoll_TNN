@@ -43,11 +43,8 @@ def set_a_cell(state, position, current_player):
 
 # Vraca novo stanje koje je nastalo odigravanjem poteza
 def get_next_state(current_state, move, player):
-    new_state = copy.deepcopy(current_state)
-
-    if move in new_state:
-        new_state[move][0] = player
-
+    new_state = current_state.copy()
+    new_state[move] = [player, current_state[move][1]]
     return new_state
 
 # Vraca listu koordinata svih slobodnih polja
@@ -153,3 +150,6 @@ def minimax(state, depth, current_player, maximizing_player):
         return max_value(state, depth, current_player, maximizing_player, alpha, beta)
     else:
         return min_value(state, depth, current_player, maximizing_player, alpha, beta)
+    
+  
+
