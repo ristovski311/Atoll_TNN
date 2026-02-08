@@ -360,7 +360,3 @@ def calculate_heur(me, state):
     opp_prog = progress(opp)
 
     return my_prog * 10 - opp_prog * 25
-
-
-
-

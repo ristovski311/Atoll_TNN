@@ -1,10 +1,8 @@
 from state.game_state import *
-from config.game_config import *
 from gameplay.game_moves import *
 from gui.game_display import *
 from auxilary.misc import *
-
-
+import config.game_config as cfg
 
 
 #
@@ -13,7 +11,7 @@ from auxilary.misc import *
 #
 
 if show_setup_menu():
-   state = create_initial_state(board_size=game_config["board_size"])
+   state = create_initial_state(board_size=cfg.game_config["board_size"])
    draw(state)
 
 

@@ -36,14 +36,19 @@ def choose_a_player(player_code):
     global game_config
 
     if player_code == "H":
-        game_config["computer_plays_first"] = False
+        game_config["computer_plays"] = False
         return True
     elif player_code == "A":
-        game_config["computer_plays_first"] = True
+        game_config["computer_plays"] = True
         return True
     else:
         print("Neispravan izbor. Unesite H ili A.")
         return False
+
+def set_computer_first(computer_first):
+    global game_config
+    game_config["computer_plays_first"] = computer_first
+    return True
 
 # Funkcija koja bira koji simbol igra prvi, X ili O
 def choose_first_symbol(first_symbol):

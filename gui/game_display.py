@@ -2,9 +2,10 @@ import tkinter as tk
 import os
 from tkinter import messagebox
 from PIL import Image, ImageTk, ImageEnhance
-from config.game_config import *
 from gameplay.game_moves import *
 from state.game_state import check_win_condition, get_current_player, toggle_current_player, set_current_player
+from config.game_config import choose_board_size, choose_a_player, choose_first_symbol, set_computer_first
+import config.game_config as cfg
 
 TITLE = 'Atoll'
 RESOLUTION = '800x600'
@@ -37,6 +38,7 @@ last_base_unit = None
 label_coords = set()
 
 can_play = True
+
 
 def darken_image(image, factor):
     enhancer = ImageEnhance.Brightness(image)
@@ -78,6 +80,7 @@ def get_canvas_coords(cell, board_size, canvas_w, canvas_h):
 
     return (canvas_w / 2) + x, (canvas_h / 2) + y, base_unit
 
+
 def update_cell_visual(canvas, cell, state):
     if cell is None or cell not in cell_items:
         return
@@ -92,6 +95,7 @@ def update_cell_visual(canvas, cell, state):
         mode = "hover"
 
     canvas.itemconfig(item_id, image=sprites[cell_state][mode])
+
 
 def on_mouse_move(event, canvas, state):
     global hovered_cell
@@ -115,11 +119,14 @@ def on_mouse_move(event, canvas, state):
         update_cell_visual(canvas, old, state)
         update_cell_visual(canvas, hovered_cell, state)
 
+
 def handle_click(cell, canvas, state):
     global clicked_cell, click_job, can_play
 
     if can_play is False:
         return
+
+    can_play = False
 
     clicked_cell = cell
     
@@ -137,35 +144,41 @@ def handle_click(cell, canvas, state):
 
         if len(preostali_potezi) > 0:
             print(f"Sledeci igrac bi mogao da odigra na: {preostali_potezi}")
+
+        update_cell_visual(canvas, cell, state)
+        canvas.update_idletasks()
+
+        if click_job:
+            canvas.after_cancel(click_job)
+        click_job = canvas.after(100, lambda: reset_click(canvas, state))
+
+        # Provera pobede: #Promeniti nacin prikaza pobede#
+        winner = check_win_condition(state, cfg.game_config["board_size"])    
+        if winner:
+            can_play = False
+            messagebox.showinfo("KRAJ IGRE", f"Čestitamo! Pobednik je: {winner}")
+            return
+
+        if cfg.game_config["computer_plays"]:
+            canvas.after(100, lambda: cpu_make_move(canvas, state))
         
     else:
         messagebox.showwarning("Greska!", "Polje nije validno! Izaberite drugo!")
 
-    update_cell_visual(canvas, cell, state)
 
-
-    if click_job:
-        canvas.after_cancel(click_job)
-    click_job = canvas.after(100, lambda: reset_click(canvas, state))
-
-    # Provera pobede: #Promeniti nacin prikaza pobede#
-    winner = check_win_condition(state, game_config["board_size"])    
-    if winner:
-        can_play = False
-        messagebox.showinfo("KRAJ IGRE", f"Čestitamo! Pobednik je: {winner}")
-        return
-    
 def reset_click(canvas, state):
     global clicked_cell
     old = clicked_cell
     clicked_cell = None
     update_cell_visual(canvas, old, state)
 
+
 def on_resize(event, canvas, state):
     global resize_job
     if resize_job:
         canvas.after_cancel(resize_job)
     resize_job = canvas.after(80, lambda: perform_resize(canvas, state))
+
 
 def draw_labels_around_board(canvas, board_size, width, height, base_unit):
     font_size = int(base_unit * 0.45)
@@ -231,7 +244,7 @@ def perform_resize(canvas, state):
     height = canvas.winfo_height()
     if width < 100 or height < 100: return
 
-    board_size = game_config["board_size"]
+    board_size = cfg.game_config["board_size"]
     _, _, base_unit = get_canvas_coords(('A', 0), board_size, width, height)
     
     sizes = {
@@ -286,7 +299,7 @@ def perform_resize(canvas, state):
 def draw(state):
     global current_player
 
-    set_current_player("GREEN" if game_config["green_plays_first"] else "RED")
+    set_current_player("GREEN" if cfg.game_config["green_plays_first"] else "RED")
 
     root = tk.Tk()
     root.title(TITLE)
@@ -302,7 +315,10 @@ def draw(state):
 
     root.after(100, lambda: perform_resize(canvas, state))
 
+    if (cfg.game_config["computer_plays"] and cfg.game_config["computer_plays_first"]):
+        root.after(100, lambda: cpu_make_move(canvas, state))
     root.mainloop()
+
 
 def show_setup_menu():
     setup_root = tk.Tk()
@@ -311,7 +327,9 @@ def show_setup_menu():
     
     size_var = tk.StringVar(value = "5")
     mode_var = tk.StringVar(value = "H")
+    computer_first = tk.StringVar(value = "F")
     symbol_var = tk.StringVar(value = "X")
+    
     
     status = {"confirmed": False}
 
@@ -324,12 +342,17 @@ def show_setup_menu():
     tk.Radiobutton(setup_root, text="Čovek protiv Čoveka", variable=mode_var, value="H").pack()
     tk.Radiobutton(setup_root, text="Čovek protiv Računara", variable=mode_var, value="A").pack()
 
-    tk.Label(setup_root, text="Ko igra prvi?", font=("Arial", 10, "bold")).pack(pady=5)
-    tk.Radiobutton(setup_root, text="X (Zeleni)", variable=symbol_var, value="X").pack()
-    tk.Radiobutton(setup_root, text="O (Crveni)", variable=symbol_var, value="O").pack()
+    tk.Label(setup_root, text="Prvi igra?", font=("Arial", 10, "bold")).pack(pady=5)
+    tk.Radiobutton(setup_root, text="Čovek", variable=computer_first, value="F").pack()
+    tk.Radiobutton(setup_root, text="Računar", variable=computer_first, value="T").pack()
+
+    tk.Label(setup_root, text="Simbol prvog igrača?", font=("Arial", 10, "bold")).pack(pady=5)
+    tk.Radiobutton(setup_root, text="ZELENI", variable=symbol_var, value="X").pack()
+    tk.Radiobutton(setup_root, text="CRVENI", variable=symbol_var, value="O").pack()
+
 
     def on_button_click():
-        start_game(size_var.get(), mode_var.get(), symbol_var.get(), setup_root)
+        start_game(size_var.get(), mode_var.get(), symbol_var.get(), computer_first.get(), setup_root)
         status["confirmed"] = True
 
     tk.Button(
@@ -344,11 +367,12 @@ def show_setup_menu():
     setup_root.mainloop()
     return status["confirmed"]
 
-def start_game(size, mode, symbol, window_to_close):
-        choose_board_size(size)
-        choose_a_player(mode)
-        choose_first_symbol(symbol)
-        window_to_close.destroy()
+def start_game(size, mode, symbol, computer_first, window_to_close):
+    choose_board_size(size)
+    choose_a_player(mode)
+    set_computer_first(True if computer_first == "T" else False)
+    choose_first_symbol(symbol)
+    window_to_close.destroy()
 
 def cpu_make_move(canvas, state):
     global can_play
@@ -368,8 +392,15 @@ def cpu_make_move(canvas, state):
     if move:
         set_a_cell(state, move, current_player)
         update_cell_visual(canvas, move, state)
-        canvas.update
+        canvas.update_idletasks()
+
         print(f"CPU odigrao: {move}")
+
+        preostali_potezi = get_all_possible_moves(state)
+        print(f"Preostalo slobodnih polja: {len(preostali_potezi)}")
+
+        if len(preostali_potezi) > 0:
+            print(f"Sledeci igrac bi mogao da odigra na: {preostali_potezi}") 
 
     winner = check_win_condition(state, cfg.game_config["board_size"])
     if winner:
@@ -380,4 +411,3 @@ def cpu_make_move(canvas, state):
     print(f"Nakon CPU poteza, sledeci igrac: {get_current_player()}")
 
     can_play = True
-
