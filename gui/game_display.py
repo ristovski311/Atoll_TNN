@@ -3,7 +3,7 @@ import os
 from tkinter import messagebox
 from PIL import Image, ImageTk, ImageEnhance
 from gameplay.game_moves import *
-from state.game_state import check_win_condition, get_current_player, toggle_current_player, set_current_player
+from state.game_state import check_win_condition, get_current_player, toggle_current_player, set_current_player, get_all_islands
 from config.game_config import choose_board_size, choose_a_player, choose_first_symbol, set_computer_first
 import config.game_config as cfg
 
@@ -142,8 +142,8 @@ def handle_click(cell, canvas, state):
         preostali_potezi = get_all_possible_moves(state)
         print(f"Preostalo slobodnih polja: {len(preostali_potezi)}")
 
-        if len(preostali_potezi) > 0:
-            print(f"Sledeci igrac bi mogao da odigra na: {preostali_potezi}")
+        # if len(preostali_potezi) > 0:
+        #     print(f"Sledeci igrac bi mogao da odigra na: {preostali_potezi}")
 
         update_cell_visual(canvas, cell, state)
         canvas.update_idletasks()
@@ -153,7 +153,7 @@ def handle_click(cell, canvas, state):
         click_job = canvas.after(100, lambda: reset_click(canvas, state))
 
         # Provera pobede: #Promeniti nacin prikaza pobede#
-        winner = check_win_condition(state, cfg.game_config["board_size"])    
+        winner = check_win_condition(state)    
         if winner:
             can_play = False
             messagebox.showinfo("KRAJ IGRE", f"Čestitamo! Pobednik je: {winner}")
@@ -375,6 +375,7 @@ def start_game(size, mode, symbol, computer_first, window_to_close):
     choose_a_player(mode)
     set_computer_first(True if computer_first == "T" else False)
     choose_first_symbol(symbol)
+    get_all_islands(cfg.game_config["board_size"])
     window_to_close.destroy()
 
 def cpu_make_move(canvas, state):
@@ -397,15 +398,15 @@ def cpu_make_move(canvas, state):
         update_cell_visual(canvas, move, state)
         canvas.update_idletasks()
 
-        print(f"CPU odigrao: {move}")
+        print(f"\nCPU odigrao: {move}\n")
 
         preostali_potezi = get_all_possible_moves(state)
         print(f"Preostalo slobodnih polja: {len(preostali_potezi)}")
 
-        if len(preostali_potezi) > 0:
-            print(f"Sledeci igrac bi mogao da odigra na: {preostali_potezi}") 
+        # if len(preostali_potezi) > 0:
+        #     print(f"Sledeci igrac bi mogao da odigra na: {preostali_potezi}") 
 
-    winner = check_win_condition(state, cfg.game_config["board_size"])
+    winner = check_win_condition(state)
     if winner:
         messagebox.showinfo("KRAJ IGRE", f"Pobednik je: {winner}")
         return 

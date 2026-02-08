@@ -33,7 +33,7 @@ import queue
 
 current_player = "GREEN"
 
-islands = dict()
+all_islands = dict()
 
 def set_current_player(player):
     global current_player
@@ -212,6 +212,9 @@ def get_all_islands(board_size: int):
     islands[('GREEN', 2)]['CELLS'] += [('RIGHT', num) for num in range(board_size + 1 + island_size, 2*board_size)]
     islands[('RED', 2)]['CELLS'] += [('RIGHT', num) for num in range(board_size + 1, board_size + 1 + island_size)]
 
+    global all_islands
+    all_islands = islands
+
     return islands
 
 # Pomocna funkcija za mapiranje koja celija pripada kom ostrvu ako ijednom
@@ -308,8 +311,9 @@ def island_distance(islands, start, target):
 
 
 # Funkcija za proveru kraja igre
-def check_win_condition(state, board_size):
-    islands = get_all_islands(board_size)
+def check_win_condition(state):
+    global all_islands
+    islands = all_islands
     connections = find_connected_islands(state, islands)
 
     total_islands = len(islands)

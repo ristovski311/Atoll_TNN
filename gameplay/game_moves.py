@@ -61,34 +61,54 @@ def get_all_possible_states(current_state, player):
 # Faza 3 - MINMAX
 #
 
+# Koristimo memoizaciju za poboljsanje performansi
+memo = {}
+
+# Pomocna funkcija koja odredjuje koliko protivnikovih polja je oko trenutnog polja
+def get_move_score(state, move, opponent_color):
+    neighbors = state[move][1]
+    score = 0
+    for n in neighbors:
+        if state[n][0] == opponent_color:
+            score += 1
+    return score
 
 def max_value(state, depth, current_player, maximizing_player, alpha, beta):
-    #Max nivo
-    
-    # Provera kraja
-    winner = game_state.check_win_condition(state, game_config.game_config["board_size"])
+    # Memoizacija
+    state_key = frozenset((coords, info[0]) for coords, info in state.items())
+    if state_key in memo:
+        cached_depth, cached_value, cached_move = memo[state_key]
+        if cached_depth >= depth:
+            return cached_move, cached_value
+
+    # Uslovi za kraj
+    winner = game_state.check_win_condition(state)
     if winner == maximizing_player:
-        return (None, 10000)
+        return (None, 10000 + depth)
     elif winner is not None:
-        return (None, -10000)
+        return (None, -10000 - depth)
     
-    # Provera dubine
     if depth == 0:
         return (None, game_state.calculate_heur(maximizing_player, state))
-    
-    # Generiši stanja
-    moves = get_all_possible_moves(state)
-    
+
+    moves = [coords for coords, info in state.items() if info[0] is None]
     if not moves:
         return (None, game_state.calculate_heur(maximizing_player, state))
-    
+
+    # Sortiramo tako da potezi sa više protivnika u okruženju budu prvi
+    opponent = "RED" if current_player == "GREEN" else "GREEN"
+    moves.sort(key=lambda m: get_move_score(state, m, opponent), reverse=True)
+
     best_move = None
     best_value = float('-inf')
-    next_player = 'RED' if current_player == 'GREEN' else 'GREEN'
-    
+    next_player = "RED" if current_player == "GREEN" else "GREEN"
+
     for move in moves:
-        new_state = get_next_state(state, move, current_player)
-        _, value = min_value(new_state, depth - 1, next_player, maximizing_player, alpha, beta)
+        state[move][0] = current_player
+        
+        _, value = min_value(state, depth - 1, next_player, maximizing_player, alpha, beta)
+        
+        state[move][0] = None
         
         if value > best_value:
             best_value = value
@@ -96,38 +116,43 @@ def max_value(state, depth, current_player, maximizing_player, alpha, beta):
         
         alpha = max(alpha, best_value)
         if beta <= alpha:
-            break  # Odsecanje
+            break
     
+    memo[state_key] = (depth, best_value, best_move)
     return (best_move, best_value)
 
 
 def min_value(state, depth, current_player, maximizing_player, alpha, beta):
-    #Min nivo
-    
-    # Provera kraja
-    winner = game_state.check_win_condition(state, game_config.game_config["board_size"])
+    state_key = frozenset((coords, info[0]) for coords, info in state.items())
+    if state_key in memo:
+        cached_depth, cached_value, cached_move = memo[state_key]
+        if cached_depth >= depth:
+            return cached_move, cached_value
+
+    winner = game_state.check_win_condition(state)
     if winner == maximizing_player:
-        return (None, 10000)
+        return (None, 10000 + depth)
     elif winner is not None:
-        return (None, -10000)
+        return (None, -10000 - depth)
     
-    # Provera dubine
     if depth == 0:
         return (None, game_state.calculate_heur(maximizing_player, state))
-    
-    # Generiši stanja
-    moves = get_all_possible_moves(state)
-    
+
+    moves = [coords for coords, info in state.items() if info[0] is None]
     if not moves:
         return (None, game_state.calculate_heur(maximizing_player, state))
-    
+
+    opponent = "RED" if current_player == "GREEN" else "GREEN"
+    moves.sort(key=lambda m: get_move_score(state, m, opponent), reverse=True)
+
     best_move = None
     best_value = float('inf')
-    next_player = 'RED' if current_player == 'GREEN' else 'GREEN'
-    
+    next_player = "RED" if current_player == "GREEN" else "GREEN"
+
     for move in moves:
-        new_state = get_next_state(state, move, current_player)
-        _, value = max_value(new_state, depth - 1, next_player, maximizing_player, alpha, beta)
+        state[move][0] = current_player
+        _, value = max_value(state, depth - 1, next_player, maximizing_player, alpha, beta)
+        state[move][0] = None
         
         if value < best_value:
             best_value = value
@@ -135,10 +160,10 @@ def min_value(state, depth, current_player, maximizing_player, alpha, beta):
         
         beta = min(beta, best_value)
         if beta <= alpha:
-            break  # Odsecanje
-    
+            break
+            
+    memo[state_key] = (depth, best_value, best_move)
     return (best_move, best_value)
-
 
 def minimax(state, depth, current_player, maximizing_player):
     alpha = float('-inf')
