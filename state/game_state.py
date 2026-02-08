@@ -337,7 +337,28 @@ def check_win_condition(state, board_size):
 #
 
 
-def calculate_heur(state, cur_user):
-    return 1
+def calculate_heur(me, state):
+    opp = "RED" if me == "GREEN" else "GREEN"
+    cols = sorted({c for (c, _) in state.keys()})
+    col_index = {c:i for i, c in enumerate(cols)}
+
+    def progress(player):
+        min_v = 999
+        max_v = -999
+        found = False
+
+        for (c, r), (p, _) in state.items():
+            if p == player:
+                found = True
+                v = r if player == "GREEN" else col_index[c]
+                if v < min_v: min_v = v
+                if v > max_v: max_v = v
+
+        return 0 if not found else max_v - min_v
+
+    my_prog = progress(me)
+    opp_prog = progress(opp)
+
+    return my_prog * 10 - opp_prog * 25
 
 
