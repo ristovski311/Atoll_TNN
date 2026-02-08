@@ -165,6 +165,9 @@ def handle_click(cell, canvas, state):
     else:
         messagebox.showwarning("Greska!", "Polje nije validno! Izaberite drugo!")
 
+    can_play = True
+    click_job = canvas.after(100, lambda: reset_click(canvas, state))
+
 
 def reset_click(canvas, state):
     global clicked_cell
@@ -384,7 +387,7 @@ def cpu_make_move(canvas, state):
 
     move, _ = minimax(
         state,
-        depth=3,
+        depth=4,
         current_player=current_player,
         maximizing_player=current_player
     )
