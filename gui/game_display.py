@@ -159,6 +159,9 @@ def handle_click(cell, canvas, state):
             messagebox.showinfo("KRAJ IGRE", f"Čestitamo! Pobednik je: {winner}")
             return
 
+        if preostali_potezi == 0:
+            messagebox.showinfo("KRAJ IGRE", "Nerešeno!")
+
         if cfg.game_config["computer_plays"]:
             canvas.after(100, lambda: cpu_make_move(canvas, state))
         
@@ -410,6 +413,9 @@ def cpu_make_move(canvas, state):
     if winner:
         messagebox.showinfo("KRAJ IGRE", f"Pobednik je: {winner}")
         return 
+
+    if get_all_possible_moves(state) == 0:
+        messagebox.showinfo("KRAJ IGRE", "Nerešeno!")
 
     toggle_current_player()
     print(f"Nakon CPU poteza, sledeci igrac: {get_current_player()}")
