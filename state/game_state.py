@@ -1,3 +1,4 @@
+from collections import deque
 from config import game_config 
 from gameplay import game_moves
 import queue
@@ -330,3 +331,13 @@ def check_win_condition(state, board_size):
                 return island[0]  # "GREEN" ili "RED" pobednik
 
     return None
+
+#
+# Faza 3 - heuristika
+#
+
+
+def calculate_heur(state, cur_user):
+    return 1
+
+
